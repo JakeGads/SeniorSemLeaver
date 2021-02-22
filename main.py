@@ -14,7 +14,7 @@ with sr.Microphone() as source:
     audio = r.listen(source)   
 
 try:
-    if  r.recognize_wit(audio) == keyword:
+    if  r.recognize_google(audio) == keyword:
         hello()
 except sr.UnknownValueError:
     print("Could not understand audio")
