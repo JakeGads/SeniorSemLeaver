@@ -1,6 +1,6 @@
 # https://realpython.com/python-speech-recognition/
 
-from PyDictionary import PyDictionary # pulls from the openword.net dict, not to be confused with Py-Dictionary which is a different package
+from pydictionary import PyDictionary # pulls from the openword.net dict, not to be confused with Py-Dictionary which is a different package
 import speech_recognition as sr # googles open source Mic reading toolset
 import psutil # allows the access of powershell on all available platforms (not windows exclusive)
 import os # allows for you to kill from process ID's
@@ -34,30 +34,8 @@ def get_keywords(word: str) -> list:
     
     # adds the word to the base of terms
     terms = [word]
-    
-    # gets and appends the words from the first iteration
-    for i in get_synonyms(word)[0][word]:
-        terms.append(i)
-
-    temp = []
-    for i in tqdm(range(len(terms))):
-        temp.extend(get_synonyms(terms[i])[0][terms[i]]) # appends to the terms's terms to a temp  
-        
-    terms.extend(temp) # writes temp back to terms (avoided an infinite loop scenario here)
-    
-    
-    # loops through and removes single 
-    for i in terms:
-        if terms.count(i) == 1:
-            del terms[terms.index(i)]
-    
-    
-    # removes all of the 0s from the set
-    for i in range(terms.count('0')):
-        try:
-            del terms[terms.index('0')]
-        except :
-            break
+    words = get_synonyms(word)
+    terms.extend(get_synonyms(word)[0][word])
     
     # removes doubles, casts as a list and returns
     return list(set(terms))
@@ -94,7 +72,7 @@ if __name__ == '__main__':
         keywords = get_keywords('bye')
         with open('bye.syn', 'w+') as f:
             for i in keywords:
-                f.writeline(i)
+                f.write(i + "\n")
 
     # loads the spreads recognizer
     r = sr.Recognizer()                    
