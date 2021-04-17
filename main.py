@@ -6,7 +6,7 @@ import psutil # allows the access of powershell on all available platforms (not 
 import os # allows for you to kill from process ID's
 from tqdm import tqdm # loading bars for `for` loops
 
-quitable_programs =  ['zoom', 'Microsoft Teams']
+quitable_programs =  ['zoom', 'Microsoft Teams'] # matches their process IDs
 
 def get_processes(process:str = 'zoom'): 
     """
@@ -67,10 +67,12 @@ def get_keywords(word: str) -> list:
 
 
 def kill_process(process:str = 'zoom'):
-    for i in get_processes(process):
-        print(f"killing {i['name']}:{i['pid']}")
-        os.system(f'kill {i["pid"]}')
-        return True
+    for i in get_processes(process): # runs over all the found process
+        # kills based on the pid instead of the app
+        # done this way for speed for constant re-kills
+        print(f"killing {i['name']}:{i['pid']}") 
+        os.system(f'kill {i["pid"]}') # kills based on current
+        return True # returns true incase it needs to loop
     return False
 
 def farwell():
@@ -83,24 +85,33 @@ def farwell():
 
 
 
+if __name__ == '__main__':                                                                
+    # populates keywords, by file if it is found
+    keywords = []
+    if os.path.exists('bye.syn'):
+        keywords = open('bye.syn', 'r').readlines()
+    else:
+        keywords = get_keywords('bye')
+        with open('bye.syn', 'w+') as f:
+            for i in keywords:
+                f.writeline(i)
 
-# get audio from the microphone                                                                       
-keywords = get_keywords('leave')
-r = sr.Recognizer()                    
+    # loads the spreads recognizer
+    r = sr.Recognizer()                    
 
-# async read
-with sr.Microphone() as source:                                                                       
-    print("In Queue:")                                                                                   
-    audio = r.listen(source)   
+    # async read
+    with sr.Microphone() as source:                                                                       
+        print("In Queue:")                                                                                   
+        audio = r.listen(source)   
 
 
-try:
-    # tests google if the spoken word is in the keywords list
-    if r.recognize_google(audio) in keywords:
-        farwell() # quits files
-except sr.UnknownValueError:
-    # for when sr fails to connect to a mic
-    print("Could not understand audio")
-except sr.RequestError as e:
-    # for when it can't be passed up
-    print("Could not request results; {0}".format(e))
+    try:
+        # tests google if the spoken word is in the keywords list
+        if r.recognize_google(audio) in keywords: # bottle neck, this is the slowest part and why this doesn't work in general
+            farwell() # quits files
+    except sr.UnknownValueError:
+        # for when sr fails to connect to a mic
+        print("Could not understand audio")
+    except sr.RequestError as e:
+        # for when it can't be passed up
+        print(f"Could not request results; {e}")
