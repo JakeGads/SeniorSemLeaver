@@ -34,15 +34,11 @@ def get_keywords(word: str) -> list:
     
     # adds the word to the base of terms
     terms = [word]
-    words = get_synonyms(word)
+    
     terms.extend(get_synonyms(word)[0][word])
     
     # removes doubles, casts as a list and returns
     return list(set(terms))
-
-    
-
-
 
 def kill_process(process:str = 'zoom'):
     for i in get_processes(process): # runs over all the found process
@@ -61,15 +57,13 @@ def farwell():
         while(kill_process(i)):
             print(i)       
 
-
-
-if __name__ == '__main__':                                                                
+def main():
     # populates keywords, by file if it is found
     keywords = []
     if os.path.exists('bye.syn'):
         keywords = open('bye.syn', 'r').readlines()
     else:
-        keywords = get_keywords('bye')
+        keywords = get_keywords('bye-bye')
         with open('bye.syn', 'w+') as f:
             for i in keywords:
                 f.write(i + "\n")
@@ -77,19 +71,29 @@ if __name__ == '__main__':
     # loads the spreads recognizer
     r = sr.Recognizer()                    
 
-    # async read
-    with sr.Microphone() as source:                                                                       
-        print("In Queue:")                                                                                   
-        audio = r.listen(source)   
+    mic = sr.Microphone(device_index=0)
 
+    # async read
+    with mic as source:
+        r.adjust_for_ambient_noise(source, 3)                                                                       
+        print("In Queue:")                                                                                   
+        audio = r.listen(source)
+        
 
     try:
         # tests google if the spoken word is in the keywords list
-        if r.recognize_google(audio) in keywords: # bottle neck, this is the slowest part and why this doesn't work in general
-            farwell() # quits files
+        x = r.recognize_google(audio)
+        print(x)
+        for i in x.split(' '):
+            if i in keywords: # bottle neck, this is the slowest part and why this doesn't work in general
+                farwell() # quits files
     except sr.UnknownValueError:
         # for when sr fails to connect to a mic
         print("Could not understand audio")
     except sr.RequestError as e:
         # for when it can't be passed up
         print(f"Could not request results; {e}")
+
+
+if __name__ == '__main__':                                                                
+    main()
