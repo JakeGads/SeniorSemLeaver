@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import *
 
 from main import main
 
-git addif __name__ == "__main__":
+if __name__ == "__main__":
     app = QApplication([])
     app.setQuitOnLastWindowClosed(False)
 
