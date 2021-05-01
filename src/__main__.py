@@ -1,7 +1,7 @@
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QApplication, QSystemTrayIcon, QMenu, QAction
 
-from main import main
+from logic import main
 
 if __name__ == "__main__":
     app = QApplication([])
