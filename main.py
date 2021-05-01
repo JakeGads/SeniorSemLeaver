@@ -73,26 +73,27 @@ def main():
 
     mic = sr.Microphone(device_index=0)
 
-    # async read
-    with mic as source:
-        r.adjust_for_ambient_noise(source, 3)                                                                       
-        print("In Queue:")                                                                                   
-        audio = r.listen(source)
-        
+    while True:
+        # async read
+        with mic as source:
+            r.adjust_for_ambient_noise(source, .5)                                                                       
+            print("In Queue:")                                                                                   
+            audio = r.listen(source, timeout=3)
+            
 
-    try:
-        # tests google if the spoken word is in the keywords list
-        x = r.recognize_google(audio)
-        print(x)
-        for i in x.split(' '):
-            if i in keywords: # bottle neck, this is the slowest part and why this doesn't work in general
-                farwell() # quits files
-    except sr.UnknownValueError:
-        # for when sr fails to connect to a mic
-        print("Could not understand audio")
-    except sr.RequestError as e:
-        # for when it can't be passed up
-        print(f"Could not request results; {e}")
+        try:
+            # tests google if the spoken word is in the keywords list
+            x = r.recognize_google(audio)
+            print(x)
+            for i in x.split(' '):
+                if i in keywords: # bottle neck, this is the slowest part and why this doesn't work in general
+                    farwell() # quits files
+        except sr.UnknownValueError:
+            # for when sr fails to connect to a mic
+            print("Could not understand audio")
+        except sr.RequestError as e:
+            # for when it can't be passed up
+            print(f"Could not request results; {e}")
 
 
 if __name__ == '__main__':                                                                
